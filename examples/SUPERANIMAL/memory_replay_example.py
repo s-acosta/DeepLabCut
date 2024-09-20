@@ -24,15 +24,14 @@ from deeplabcut.utils.pseudo_label import keypoint_matching
 def main(dlc_proj_root: Path, super_animal_name: str):
     config_path = str(dlc_proj_root / "config.yaml")
     model_name = "hrnetw32"
+    detector_name = "fasterrcnn"
     shuffle = 0
     device = "cuda"
 
     # keypoint matching before create training dataset
     # keypoint matching creates pseudo prediction and a conversion table
     keypoint_matching(
-        config_path,
-        super_animal_name,
-        model_name,
+        config_path, super_animal_name, model_name, detector_name, copy_images=True
     )
 
     # keypoint matching creates a memory_replay folder in the root. The conversion table

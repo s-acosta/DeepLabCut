@@ -695,6 +695,14 @@ _WEIGHT_INIT_OPTIONS = {  # FIXME - Generate dynamically
         "model_filter": None,
         "detector_filter": None,
     },
+    "Transfer Learning - SuperAnimal Bird": {
+        "default_net": "top_down_resnet_50",
+        "model_filter": [
+            "resnet_50",
+        ],
+        "detector_filter": ["ssdlite"],
+        "super_animal": "superanimal_bird",
+    },
     "Transfer Learning - SuperAnimal Quadruped": {
         "default_net": "top_down_hrnet_w32",
         "model_filter": [
@@ -712,6 +720,14 @@ _WEIGHT_INIT_OPTIONS = {  # FIXME - Generate dynamically
         ],
         "detector_filter": ["fasterrcnn_resnet50_fpn_v2"],
         "super_animal": "superanimal_topviewmouse",
+    },
+    "Fine-tuning - SuperAnimal Bird": {
+        "default_net": "top_down_resnet_50",
+        "model_filter": [
+            "resnet_50",
+        ],
+        "detector_filter": ["ssdlite"],
+        "super_animal": "superanimal_bird",
     },
     "Fine-tuning - SuperAnimal Quadruped": {
         "default_net": "top_down_hrnet_w32",

@@ -588,6 +588,7 @@ def create_multianimaltraining_dataset(
                         project_config=cfg,
                         pose_config_path=path_train_config,
                         net_type=net_type,
+                        detector_type=detector_type,
                         weight_init=weight_init,
                     )
                 else:

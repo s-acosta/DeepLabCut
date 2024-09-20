@@ -42,10 +42,17 @@ def _build_detector(
     detector: BaseDetector = build_from_cfg(cfg, **kwargs)
 
     if weight_init is not None:
+        # FIXME(niels): refactor for multiple options
+        pose_model_type = "hrnetw32"
+        detector_type = "ssdlite"
+        if weight_init.dataset == "superanimal_bird":
+            pose_model_type = "resnet_50"
+            detector_type = "ssdlite"
+
         _, _, _, snapshot_path = modelzoo_utils.get_config_model_paths(
             project_name=weight_init.dataset,
-            pose_model_type="hrnetw32",  # pose model does not matter here
-            detector_type="fasterrcnn",  # TODO: include variant
+            pose_model_type=pose_model_type,
+            detector_type=detector_type,
         )
         if weight_init.customized_detector_checkpoint is not None:
             snapshot_path = weight_init.customized_detector_checkpoint

@@ -215,7 +215,7 @@ class PartAffinityFieldPredictor(BasePredictor):
     ) -> torch.Tensor:
         s, b, r, c = peak_inds_in_batch.T
         stride_y, stride_x = strides
-        strides = torch.Tensor((stride_x, stride_y)).to(locrefs.device)
+        strides = torch.tensor((stride_x, stride_y)).to(locrefs.device)
         off = locrefs[s, b, :, r, c]
         loc = strides * peak_inds_in_batch[:, [3, 2]] + strides // 2 + off
         return torch.round(loc, decimals=n_decimals)

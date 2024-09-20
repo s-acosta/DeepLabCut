@@ -196,9 +196,15 @@ class PoseModel(nn.Module):
 
             # load pretrained weights
             if weight_init.customized_pose_checkpoint is None:
+                # FIXME(niels): make multiple options possible
+                detector_type = "fasterrcnn"
+                if weight_init.dataset == "superanimal_bird":
+                    detector_type = "ssdlite"
+
                 _, _, snapshot_path, _ = modelzoo_utils.get_config_model_paths(
                     project_name=weight_init.dataset,
                     pose_model_type=pose_model_type,
+                    detector_type=detector_type,
                 )
             else:
                 snapshot_path = weight_init.customized_pose_checkpoint

@@ -39,27 +39,42 @@ def get_config_model_paths(
     Returns:
         the paths to the models and project configs
     """
-    dlc_root_path = auxiliaryfunctions.get_deeplabcut_path()
-    modelzoo_path = os.path.join(dlc_root_path, "modelzoo")
+    dlc_root_path = Path(auxiliaryfunctions.get_deeplabcut_path())
+    modelzoo_path = dlc_root_path / "modelzoo"
 
-    model_cfg_path = os.path.join(
-        modelzoo_path, "model_configs", f"{pose_model_type}.yaml"
-    )
-    model_config = auxiliaryfunctions.read_plainconfig(model_cfg_path)
-    project_config = auxiliaryfunctions.read_config(
-        os.path.join(modelzoo_path, "project_configs", f"{project_name}.yaml")
-    )
+    config_path = modelzoo_path / "project_configs" / f"{project_name}.yaml"
+    project_config = config_utils.read_config_as_dict(config_path)
+    model_config_path = modelzoo_path / "model_configs" / f"{pose_model_type}.yaml"
+    model_config = config_utils.read_config_as_dict(model_config_path)
 
-    model_config = add_metadata(project_config, model_config, model_cfg_path)
+    model_config = add_metadata(project_config, model_config, model_config_path)
     if weight_folder is None:
-        weight_folder = os.path.join(modelzoo_path, "checkpoints")
+        weight_folder = modelzoo_path / "checkpoints"
+    else:
+        weight_folder = Path(weight_folder)
 
     # FIXME - DO NOT DOWNLOAD HERE
     pose_model_name = f"{project_name}_{pose_model_type}.pth"
-    pose_model_path = os.path.join(weight_folder, pose_model_name)
+    pose_model_path = weight_folder / pose_model_name
     detector_name = f"{project_name}_{detector_type}.pt"
-    detector_model_path = os.path.join(weight_folder, detector_name)
-    if not (Path(pose_model_path).exists() and Path(detector_model_path).exists()):
+    detector_model_path = weight_folder / detector_name
+
+    if project_name == "superanimal_bird":
+        # FIXME(niels): Temporary fix to include the SuperAnimal-Bird model; refactor
+        #  when allowing multiple model architectures per project
+        pose_model_path = pose_model_path.with_suffix(".pt")
+        if not pose_model_path.exists():
+            download_huggingface_model(
+                f"{project_name}_{pose_model_type}",
+                target_dir=str(weight_folder),
+            )
+        if not detector_model_path.exists():
+            download_huggingface_model(
+                f"{project_name}_{detector_type}",
+                target_dir=str(weight_folder),
+            )
+
+    elif not pose_model_path.exists() and detector_model_path.exists():
         download_huggingface_model(
             f"{project_name}_{pose_model_type}",
             target_dir=str(weight_folder),
@@ -69,9 +84,10 @@ def get_config_model_paths(
             },
         )
 
-    # FIXME: Needed due to changes in code - remove when new snapshots are uploaded
-    pose_model_path = _parse_model_snapshot(Path(pose_model_path), device="cpu")
-    detector_model_path = _parse_model_snapshot(Path(detector_model_path), device="cpu")
+    if project_name != "superanimal_bird":
+        # FIXME: Needed due to changes in code - remove when new snapshots are uploaded
+        pose_model_path = _parse_model_snapshot(pose_model_path, device="cpu")
+        detector_model_path = _parse_model_snapshot(detector_model_path, device="cpu")
 
     return (
         model_config,
@@ -161,8 +177,9 @@ def _parse_model_snapshot(base: Path, device: str, print_keys: bool = False) -> 
 
 def get_pose_model_type(backbone: str) -> str:
     """Temporary fix: pose_model_types for SuperAnimal models do not match net types"""
-    if backbone.startswith("resnet"):
-        return backbone
+    # FIXME(niels): should not need this - weights path in config
+    if backbone == "resnet50_gn":
+        return "resnet_50"
     elif backbone.startswith("hrnet"):
         return backbone.replace("_", "")
 

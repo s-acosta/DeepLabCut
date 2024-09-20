@@ -11,20 +11,24 @@
 """Methods to create the configuration files to fine-tune SuperAnimal models"""
 from __future__ import annotations
 
+import os
+from pathlib import Path
+
+from ruamel.yaml import YAML
+
 import deeplabcut.pose_estimation_pytorch.config.utils as config_utils
 import deeplabcut.pose_estimation_pytorch.modelzoo.utils as modelzoo_utils
 import deeplabcut.utils.auxiliaryfunctions as af
-from deeplabcut.core.weight_init import WeightInitialization
-from pathlib import Path
 from deeplabcut.core.engine import Engine
-from ruamel.yaml import YAML
-import os
+from deeplabcut.core.weight_init import WeightInitialization
+
 
 def make_super_animal_finetune_config(
     weight_init: WeightInitialization,
     project_config: dict,
     pose_config_path: str,
-    net_type: str | None = None,
+    net_type: str,
+    detector_type: str,
 ) -> dict:
     """
     Creates a PyTorch pose configuration file to finetune a SuperAnimal model on a
@@ -35,6 +39,7 @@ def make_super_animal_finetune_config(
         project_config: The project configuration.
         pose_config_path: The path where the pose configuration file will be saved
         net_type: The type of neural net to finetune.
+        detector_type: The type of detector to finetune.
 
     Returns:
         The generated pose configuration file.
@@ -71,6 +76,7 @@ def make_super_animal_finetune_config(
     # Load the exact pose configuration file for the model to fine-tune
     return create_config_from_modelzoo(
         net_type=net_type,
+        detector_type=detector_type,
         super_animal=weight_init.dataset,
         converted_bodyparts=converted_bodyparts,
         weight_init=weight_init,
@@ -81,6 +87,7 @@ def make_super_animal_finetune_config(
 
 def create_config_from_modelzoo(
     net_type: str,
+    detector_type: str,
     super_animal: str,
     converted_bodyparts: list[str],
     weight_init: WeightInitialization,
@@ -104,6 +111,7 @@ def create_config_from_modelzoo(
     pose_config, project_cfg, _, _ = modelzoo_utils.get_config_model_paths(
         project_name=super_animal,
         pose_model_type=modelzoo_utils.get_pose_model_type(net_type),
+        detector_type=detector_type,
     )
 
     # use SuperAnimal bodyparts
@@ -128,26 +136,15 @@ def create_config_from_modelzoo(
     # sort first-level keys to make it prettier
     return dict(sorted(pose_config.items()))
 
-def write_pytorch_config_for_memory_replay(config_path,
-                                           shuffle,
-                                           pytorch_config):
 
-    cfg = af.read_config(config_path)
-
-    trainIndex = 0    
-
+def write_pytorch_config_for_memory_replay(config_path, shuffle, pytorch_config):
+    cfg = config_utils.read_config_as_dict(config_path)
+    train_index = 0
+    train_frac = cfg["TrainingFraction"][train_index]
     dlc_proj_root = Path(config_path).parent
-    
-    model_folder = dlc_proj_root / af.get_model_folder(
-        cfg['TrainingFraction'][trainIndex], shuffle, cfg, engine=Engine.PYTORCH)
-    
-
-    os.makedirs(model_folder / 'train', exist_ok = True)
-    
-    out_path = model_folder / 'train' / 'pytorch_config.yaml'
-
-
-    
-    with open(str(out_path), 'w') as f:
+    model_folder = af.get_model_folder(train_frac, shuffle, cfg, engine=Engine.PYTORCH)
+    os.makedirs(dlc_proj_root / model_folder / "train", exist_ok=True)
+    out_path = dlc_proj_root / model_folder / "train" / "pytorch_config.yaml"
+    with open(str(out_path), "w") as f:
         yaml = YAML()
         yaml.dump(pytorch_config, f)

@@ -149,6 +149,7 @@ def keypoint_matching(
     config_path: str | Path,
     superanimal_name: str,
     model_name: str,
+    detector_name: str,
     copy_images: bool = False,
     device: str | None = None,
     train_file: str = "train.json",
@@ -162,6 +163,7 @@ def keypoint_matching(
         config_path: The path of the DeepLabCut project configuration file.
         superanimal_name: SuperAnimal dataset with which to run keypoint matching.
         model_name: SuperAnimal model with which to run keypoint matching
+        detector_name: SuperAnimal detector with which to run keypoint matching
         copy_images: When False, symlinks are created for the dataset used for keypoint
             matching. Otherwise, images are copied from the `labeled-data` folder to the
             folder used for keypoint matching.
@@ -190,7 +192,7 @@ def keypoint_matching(
         project_config,
         pose_model_path,
         detector_path,
-    ) = get_config_model_paths(superanimal_name, model_name)
+    ) = get_config_model_paths(superanimal_name, model_name, detector_name)
 
     if device is None:
         device = select_device()
@@ -288,6 +290,12 @@ def keypoint_matching(
     for name, gts in image_name_to_gt.items():
         bbox_gts = [np.array(gt["bbox"]) for gt in gts]
         bbox_gts = [xywh2xyxy(e) for e in bbox_gts]
+
+        print()
+        print(name)
+        print(image_name_to_pred)
+        print()
+
         prediction = image_name_to_pred[name]
         bbox_preds = [xywh2xyxy(pred) for pred in prediction["bboxes"]]
         optimal_pred_indices = optimal_match(bbox_gts, bbox_preds)

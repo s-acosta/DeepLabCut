@@ -969,6 +969,7 @@ def create_training_dataset(
             num_shuffles,
             Shuffles,
             net_type=net_type,
+            detector_type=detector_type,
             trainIndices=trainIndices,
             testIndices=testIndices,
             userfeedback=userfeedback,
@@ -1275,6 +1276,7 @@ def create_training_dataset(
                             project_config=cfg,
                             pose_config_path=path_train_config,
                             net_type=net_type,
+                            detector_type=detector_type,
                             weight_init=weight_init,
                         )
                     else:

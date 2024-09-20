@@ -155,46 +155,45 @@ def parse_project_model_name(superanimal_name: str) -> tuple[str, str]:
         project_name: the parsed SuperAnimal model name
         model_name: the model architecture (e.g., dlcrnet, hrnetw32)
     """
-
+    depr_message = (
+        f"{superanimal_name} is deprecated and will be removed in a future version. "
+        f"Use {superanimal_name}_model_suffix instead."
+    )
     if superanimal_name == "superanimal_quadruped":
-        warnings.warn(
-            f"{superanimal_name} is deprecated and will be removed in a future version. Use {superanimal_name}_model_suffix instead.",
-            DeprecationWarning,
-        )
+        warnings.warn(depr_message, DeprecationWarning)
         superanimal_name = "superanimal_quadruped_hrnetw32"
 
     if superanimal_name == "superanimal_topviewmouse":
-        warnings.warn(
-            f"{superanimal_name} is deprecated and will be removed in a future version. Use {superanimal_name}_model_suffix instead.",
-            DeprecationWarning,
-        )
+        warnings.warn(depr_message, DeprecationWarning)
         superanimal_name = "superanimal_topviewmouse_dlcrnet"
 
-    model_name = superanimal_name.split("_")[-1]
-    project_name = superanimal_name.replace(f"_{model_name}", "")
+    name_parts = superanimal_name.split("_")
+    project_name = name_parts[1]
+    model_name = "_".join(name_parts[2:])
 
-    dlc_root_path = get_deeplabcut_path()
-    modelzoo_path = os.path.join(dlc_root_path, "modelzoo")
+    dlc_root_path = Path(get_deeplabcut_path())
+    modelzoo_path = dlc_root_path / "modelzoo"
+    available_model_configs = glob(str(modelzoo_path / "model_configs" / "*.yaml"))
+    available_models = [Path(model_path).name for model_path in available_model_configs]
 
-    available_model_configs = glob(
-        os.path.join(modelzoo_path, "model_configs", "*.yaml")
-    )
-    available_models = [
-        os.path.splitext(os.path.basename(path))[0] for path in available_model_configs
-    ]
+    # FIXME(niels): integration of which architectures are available with which models
+    if superanimal_name == "superanimal_bird":
+        if model_name != "resnet_50":
+            raise ValueError(
+                f"Model {model_name} is not available for the SuperAnimal-Bird model. "
+                f"Available models are: ['resnet_50']"
+            )
+    else:
+        if model_name == "resnet50":
+            raise ValueError(
+                f"Model {model_name} is only available for the SuperAnimal-Bird model. "
+                f"Available models are: {available_models}"
+            )
 
     if model_name not in available_models:
         raise ValueError(
             f"Model {model_name} not found. Available models are: {available_models}"
         )
-
-    available_project_configs = glob(
-        os.path.join(modelzoo_path, "project_configs", "*.yaml")
-    )
-    available_projects = [
-        os.path.splitext(os.path.basename(path))[0]
-        for path in available_project_configs
-    ]
 
     return project_name, model_name
 
@@ -289,4 +288,6 @@ def get_superanimal_colormaps():
             list(superanimal_quadruped_colors), name="superanimal_quadruped"
         ),
     }
+
+    # FIXME(niels): SuperAnimal-Bird color map
     return superanimal_colormaps

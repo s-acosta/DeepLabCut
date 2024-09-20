@@ -15,7 +15,6 @@ import os
 from pathlib import Path
 from typing import Optional, Union
 
-import numpy as np
 from dlclibrary.dlcmodelzoo.modelzoo_download import download_huggingface_model
 from ruamel.yaml import YAML
 
@@ -63,6 +62,7 @@ def video_inference_superanimal(
 
     * superanimal_topviewmouse_hrnetw32 - > PyTorch
     * superanimal_quadruped_hrnetw32 -> PyTorch
+    * superanimal_bird_resnet_50 -> PyTorch
     * superanimal_topviewmouse_dlcrnet -> TensorFlow
     * superanimal_quadruped_dlcrnet -> TensorFlow
 
@@ -235,6 +235,7 @@ def video_inference_superanimal(
 
     redownload = False
     if framework == "pytorch":
+        # FIXME(niels): SuperAnimal Bird
         pose_model_name = f"{project_name}_{model_name}.pth"
         detector_name = f"{project_name}_fasterrcnn.pt"
         rename_mapping = {
