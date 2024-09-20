@@ -178,9 +178,9 @@ def _parse_model_snapshot(base: Path, device: str, print_keys: bool = False) -> 
 def get_pose_model_type(backbone: str) -> str:
     """Temporary fix: pose_model_types for SuperAnimal models do not match net types"""
     # FIXME(niels): should not need this - weights path in config
-    if backbone == "resnet50_gn":
+    if "resnet" in backbone:
         return "resnet_50"
     elif backbone.startswith("hrnet"):
         return backbone.replace("_", "")
 
-    raise ValueError(f"Unknown backbone for SuperAnimal Weights")
+    raise ValueError(f"Unknown backbone for SuperAnimal Weights: {backbone}")
