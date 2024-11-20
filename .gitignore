@@ -125,3 +125,10 @@ ENV/
 
 # mypy
 .mypy_cache/
+conda-environments/labeled-data/24113_test/img000.png
+conda-environments/labeled-data/24113_test/img115.png
+conda-environments/labeled-data/24113_test/img313.png
+conda-environments/labeled-data/24113_test/img382.png
+conda-environments/labeled-data/24113_test/img214.png
+conda-environments/labeled-data/24113_test/img385.png
+conda-environments/labeled-data/24113_test/img586.png

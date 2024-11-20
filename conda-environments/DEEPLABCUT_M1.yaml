@@ -1,43 +1,79 @@
-# DEEPLABCUT_M1.yaml
+# Project definitions (do not edit)
+Task:
+scorer:
+date:
+multianimalproject:
+identity:
 
-#DeepLabCut2.0 Toolbox (deeplabcut.org)
-#© A. & M.W. Mathis Labs
-#https://github.com/DeepLabCut/DeepLabCut
-#Please see AUTHORS for contributors.
 
-#https://github.com/DeepLabCut/DeepLabCut/blob/master/AUTHORS
-#Licensed under GNU Lesser General Public License v3.0
-#
-# DeepLabCut M1/M2 (Apple Silicon) environment instructions
-#
-# We'll get the miniconda M1 bash installer, as explained in
-# https://docs.conda.io/projects/conda/en/latest/user-guide/install/macos.html
-#
-# In the Terminal, run the following commands:
-# wget https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-MacOSX-arm64.sh -O ~/miniconda.sh
-# bash ~/miniconda.sh -b -p $HOME/miniconda
-# source ~/miniconda/bin/activate
-# conda init zsh
-#
-# Then, `git clone DeepLabCut`, and run:
-#
-# conda env create -f conda-environments/DEEPLABCUT_M1.yaml
-#
-# Next, activate the environment, and launch DLC with pythonw -m deeplabcut
+# Project path (change when moving around)
+project_path: C:\Users\acostamendoza\pipelines\DeepLabCut\conda-environments
 
+
+# Default DeepLabCut engine to use for shuffle creation (either pytorch or tensorflow)
+engine: tensorflow
+
+
+# Annotation data set configuration (and individual video cropping parameters)
+video_sets:
+bodyparts:
+
+
+# Fraction of video to start/stop when extracting frames for labeling/refinement
+start:
+stop:
+numframes2pick:
+
+
+# Plotting configuration
+skeleton: []
+skeleton_color: black
+pcutoff:
+dotsize:
+alphavalue:
+colormap:
+
+
+# Training,Evaluation and Analysis configuration
+TrainingFraction:
+iteration:
+default_net_type:
+default_augmenter:
+snapshotindex:
+detector_snapshotindex: -1
+batch_size:
+detector_batch_size: 1
+
+
+# Cropping Parameters (for analysis and outlier frame detection)
+cropping:
+#if cropping is true for analysis, then set the values here:
+x1:
+x2:
+y1:
+y2:
+
+
+# Refinement configuration (parameters from annotation dataset configuration also relevant in this stage)
+corner2move2:
+move2corner:
+
+
+# Conversion tables to fine-tune SuperAnimal weights
+SuperAnimalConversionTables:
 name: DEEPLABCUT_M1
 channels:
-  - conda-forge
-  - defaults
+- conda-forge
+- defaults
 dependencies:
-  - python=3.10
-  - pip
-  - ipython
-  - jupyter
-  - nb_conda
-  - notebook<7.0.0
-  - python.app
-  - ffmpeg
-  - apple::tensorflow-deps
-  - pip:
-    - "deeplabcut[gui,apple_mchips]"
+- python=3.10
+- pip
+- ipython
+- jupyter
+- nb_conda
+- notebook<7.0.0
+- python.app
+- ffmpeg
+- apple::tensorflow-deps
+- pip:
+  - deeplabcut[gui,apple_mchips]
